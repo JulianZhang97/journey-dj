@@ -3,13 +3,16 @@
  * This is only a minimal backend to get started.
  */
 
+//Run command nx serve my-app
+
 import * as express from 'express';
-import { playlist } from './routes';
+
+import { playlist } from './playlist';
 
 
 const app = express();
 
-app.use('./api/playlist', playlist);
+app.use('/api/playlist', playlist);
 
 app.get('/api', (req, res) => {
   res.send({ message: 'Welcome to dj-journey-api!' });
