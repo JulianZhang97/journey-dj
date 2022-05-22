@@ -4,18 +4,18 @@
  */
 
 import * as express from 'express';
+import { playlist } from './routes';
 
 
 const app = express();
+
+app.use('./api/playlist', playlist);
 
 app.get('/api', (req, res) => {
   res.send({ message: 'Welcome to dj-journey-api!' });
 });
 
-app.get('/makeplaylist', (req, res) => {
-  //Request needs to include origin/destination + Spotify user credentails 
-  res.send({ message: 'Welcome to dj-journey-api!' });
-});
+
 
 const port = process.env.port || 3333;
 const server = app.listen(port, () => {
