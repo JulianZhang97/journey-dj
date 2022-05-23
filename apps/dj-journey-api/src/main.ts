@@ -6,13 +6,20 @@
 //Run command nx serve my-app
 
 import * as express from 'express';
+import * as dotenv from 'dotenv';
+import * as cors from 'cors';
 
 import { playlist } from './playlist';
+import { auth } from './auth'
 
 
 const app = express();
+app.use(cors());
 
-app.use('/api/playlist', playlist);
+dotenv.config();
+
+app.use('/playlist', playlist);
+app.use('/login', auth);
 
 app.get('/api', (req, res) => {
   res.send({ message: 'Welcome to dj-journey-api!' });

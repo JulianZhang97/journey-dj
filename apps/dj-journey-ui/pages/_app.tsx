@@ -6,7 +6,7 @@ function CustomApp({ Component, pageProps }: AppProps) {
   return (
     <>
       <Head>
-        <title>Welcome to dj-journey-ui!</title>
+        <title>DJ Journey</title>
       </Head>
       <main className="app">
         <Component {...pageProps} />
