@@ -3,7 +3,7 @@
  * This is only a minimal backend to get started.
  */
 
-//Run command nx serve my-app
+//nx serve dj-journey-api
 
 import * as express from 'express';
 import * as dotenv from 'dotenv';

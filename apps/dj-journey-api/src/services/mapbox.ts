@@ -3,9 +3,9 @@ import axios from 'axios';
 
 export default async function getTripInfo(request){
     try{
-        const {profile, origin, destination} = request.query;
+        const {origin, destination} = request.query;
     
-        const reqURL = `${process.env.MAPBOX_MATRIX_URL}/${profile}/${origin};${destination}`;
+        const reqURL = `${process.env.MAPBOX_MATRIX_URL}/mapbox/driving/${origin};${destination}`;
         const accessToken = process.env.MAPBOX_TOKEN
         const params = {
             access_token: accessToken,

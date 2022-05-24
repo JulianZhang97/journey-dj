@@ -43,11 +43,12 @@ router.get('/callback', async function(req, res) {
         
 
         if (tokenResponse.status === 200) {
-            const { access_token, token_type, refresh_token } = tokenResponse.data;
+            const { access_token, token_type, refresh_token, expires_in } = tokenResponse.data;
 
             const queryParams = qs.stringify({
                 access_token,
-                refresh_token
+                refresh_token,
+                expires_in
             })
 
             res.redirect(`${process.env.CLIENT_URL}:${process.env.CLIENT_PORT}/?${queryParams}`)
@@ -71,13 +72,16 @@ router.get('/callback', async function(req, res) {
   });
 
 router.get('/refresh_token', async function(req, res) {
+  try{
+    console.log("Refreshing Token")
+
     const { refresh_token } = req.query;
     const headers =  {
         'content-type': 'application/x-www-form-urlencoded',
         Authorization: `Basic ${new Buffer(`${process.env.SPOTIFY_CLIENT_ID}:${process.env.SPOTIFY_CLIENT_SECRET}`).toString('base64')}`,
       }
 
-    axios({
+    const refreshRes = await axios({
         method: 'post',
         url: 'https://accounts.spotify.com/api/token',
         data: qs.stringify({
@@ -85,7 +89,13 @@ router.get('/refresh_token', async function(req, res) {
           refresh_token: refresh_token
         }),
         headers
-      })
+      });
+      res.send(refreshRes.data);
+  }
+  catch(error){
+    console.error("Refresh token error occured", error);
+    res.send(error);
+}       
 })
 
 

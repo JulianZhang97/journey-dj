@@ -12,7 +12,8 @@ const nextConfig = {
   },
   env: {
     SERVER_URL: process.env.SERVER_URL,
-    SERVER_PORT: process.env.SERVER_PORT
+    SERVER_PORT: process.env.SERVER_PORT,
+    MAPBOX_TOKEN: process.env.MAPBOX_TOKEN 
   }
 };
 
