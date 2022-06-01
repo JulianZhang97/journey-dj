@@ -45,7 +45,7 @@ export function Index() {
         </div>
         {profile && <div>
           <h1>Welcome Back {profile.display_name}!</h1>
-          <UserMap />
+          <UserMap spotifyToken={token}/>
         </div>}
       </div>
     </div>

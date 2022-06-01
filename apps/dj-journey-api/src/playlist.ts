@@ -1,15 +1,25 @@
+import { AxiosRequestConfig } from 'axios';
 import * as express from 'express';
 const router = express.Router();
 
-import getTripInfo from './services/mapbox';
+import { getTripDuration } from './services/mapbox';
+import { generatePlaylist } from './services/spotify';
 
 
 
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
+  //TODO: Need request typings here
+
+  const {origin, destination, travelType, spotifyToken, tripName} = req.query;
+
     //Request needs to include origin/destination + Spotify user credentails 
-    const tripInfo = getTripInfo(req);
+    const tripDuration = await getTripDuration(origin as string, destination as string, travelType as string);
 
-    res.send({ info: tripInfo });
+    const generatedPlaylist = await generatePlaylist(tripDuration, spotifyToken as string);
+
+    res.send({ 
+      tripDurationSeconds: tripDuration,
+      playlist: generatedPlaylist});
   });
 
 

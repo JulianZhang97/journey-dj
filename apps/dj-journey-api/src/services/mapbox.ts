@@ -1,11 +1,9 @@
 import axios from 'axios';
 
 
-export default async function getTripInfo(request){
-    try{
-        const {origin, destination} = request.query;
-    
-        const reqURL = `${process.env.MAPBOX_MATRIX_URL}/mapbox/driving/${origin};${destination}`;
+export async function getTripDuration(origin: string, destination: string, travelType: string){
+    try{    
+        const reqURL = `${process.env.MAPBOX_MATRIX_URL}/${travelType}/${origin};${destination}`;
         const accessToken = process.env.MAPBOX_TOKEN
         const params = {
             access_token: accessToken,
@@ -14,10 +12,8 @@ export default async function getTripInfo(request){
         }
 
         const tripInfo = (await axios.get(reqURL, {params})).data;
-
-        console.log(tripInfo);
         
-        return tripInfo;
+        return tripInfo.durations[0][0];
     }
     catch(error){
         console.error("An error occured!", error);

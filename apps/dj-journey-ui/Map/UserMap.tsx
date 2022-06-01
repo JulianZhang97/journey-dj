@@ -1,24 +1,30 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
-
-import styles from '../pages/index.module.scss';
-import Map from 'react-map-gl';
 import axios from 'axios';
+import { useEffect, useState } from 'react';
+import Map from 'react-map-gl';
+import styles from '../pages/index.module.scss';
+
 
 interface MapProps {
-  testProp?: string;
+  spotifyToken: string
 }
 
 function setAddressResult(coordinateList: number[]): string {
-  return `${coordinateList[0]};${coordinateList[1]}`
+  return `${coordinateList[0]},${coordinateList[1]}`
 }
 
 export function UserMap(props: MapProps) {
+  const { spotifyToken } = props;
+
   const [origin, setOrigin] = useState<number[]>(null);
   const [originName, setOriginName] = useState<string>();
   const [destination, setDestination] = useState<number[]>(null);
   const [destinationName, setDestinationName] = useState<string>();
+  
+  // TODO: Add these as user editable fields
+  const [travelType, setTravelType] = useState<string>('mapbox/driving');
+  const [tripName, setTripName] = useState<string>('My Travel Playlist');
 
   useEffect(() => {
     console.log('origin is:', origin);
@@ -52,11 +58,14 @@ export function UserMap(props: MapProps) {
   
     const params = {
       origin: setAddressResult(origin),
-      destination: setAddressResult(destination)
+      destination: setAddressResult(destination),
+      travelType,
+      spotifyToken,
+      tripName,
     }
     const tripRes = await axios.get(`${process.env.SERVER_URL}:${process.env.SERVER_PORT}/playlist`, { params });
 
-    
+    console.log(tripRes);
   }
 
   return (
