@@ -27,8 +27,12 @@ function getTopItemInfo(playListItem): TopTrackWithId {
     }
 }
 
-function getFavouriteTracks(timeRange: string){
+async function getFavouriteTracks(timeRange: string){
     return axios.get('/me/top/tracks', {params: {limit: topLimit, time_range: timeRange}})
+}
+
+async function getUserTopArtists(timeRange: string){
+    return axios.get('/me/top/artists', {params: {time_range: timeRange}})
 }
 
 
@@ -36,12 +40,12 @@ export async function generatePlaylist(tripDurationSeconds: number, spotifyToken
     axios.defaults.headers['Authorization'] = `Bearer ${spotifyToken}`;
 
     // // try{
-
     // // }
     // catch(error){
     //     console.error("An error occured!", error);
     // } 
 }
+
 
 export async function generateUserTopItems(spotifyToken: string){
     try{
@@ -69,6 +73,7 @@ export async function generateUserTopItems(spotifyToken: string){
         });
 
         //Return map as array of top songs (should be unique)
+        return favSongMap;
     }
 
     catch(error){
