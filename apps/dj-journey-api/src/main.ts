@@ -9,8 +9,8 @@ import * as express from 'express';
 import * as dotenv from 'dotenv';
 import * as cors from 'cors';
 
-import { playlist } from './playlist';
-import { auth } from './auth'
+import { playlist } from './routes/playlist';
+import { auth } from './routes/auth'
 
 
 const app = express();

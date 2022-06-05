@@ -1,8 +1,8 @@
 import * as express from 'express';
-import { getTripDuration } from './services/mapbox';
+import { getTripDuration } from '../services/mapbox';
 import {
   generatePlaylist
-} from './services/spotify';
+} from '../services/spotify';
 const router = express.Router();
 
 router.get('/', async (req, res) => {

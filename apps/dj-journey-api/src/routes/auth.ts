@@ -4,7 +4,7 @@ import * as qs from 'qs';
 
 const router = express.Router();    
 
-
+// TODO: Need to add standardized client/server payload typings
 router.get('/', function(req, res) {
   const state = Math.random().toString(16);
   const scope = 'user-read-email user-top-read user-library-read playlist-read-private playlist-modify-private';

@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 
-export async function getTripDuration(origin: string, destination: string, travelType: string){
+export async function getTripDuration(origin: string, destination: string, travelType: string): Promise<number>{
     try{    
         const reqURL = `${process.env.MAPBOX_MATRIX_URL}/${travelType}/${origin};${destination}`;
         const accessToken = process.env.MAPBOX_TOKEN
