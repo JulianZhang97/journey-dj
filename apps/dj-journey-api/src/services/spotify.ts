@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { topLimit } from '../constants';
+import { playlistSongAddLimit, userTopSongsLimit } from '../constants';
 
 axios.defaults.baseURL = 'https://api.spotify.com/v1';
 axios.defaults.headers['Content-Type'] = 'application/json';
@@ -29,21 +29,60 @@ function getTopItemInfo(playListItem): TopTrackWithId {
     }
 }
 
-async function getFavouriteTracks(timeRange: string){
-    return axios.get('/me/top/tracks', {params: {limit: topLimit, time_range: timeRange}})
-}
-
-async function getUserTopArtists(timeRange: string){
-    return axios.get('/me/top/artists', {params: {time_range: timeRange}})
-}
-
-
 function weightedSongSort(songA: TopTrack, songB: TopTrack): number {
     //Based on "Weighted Random Sampling algorithm from https://softwareengineering.stackexchange.com/questions/233541/how-to-implement-a-weighted-shuffle"
     const aVal = Math.random() ** (1.0 / songA.popularityScore);
     const bVal = Math.random() ** (1.0 / songB.popularityScore);
 
     return bVal - aVal;
+}
+
+// https://stackabuse.com/how-to-split-an-array-into-even-chunks-in-javascript/
+function breakIntoChunks(array, chunkSize){
+    const finalArr = [];
+    for (let i = 0; i < finalArr.length; i += chunkSize) {
+        const chunk = finalArr.slice(i, i + chunkSize);
+        finalArr.push(chunk);
+    }
+    return finalArr;
+}
+
+// TODO: Move these into separate file
+
+async function getFavouriteTracks(timeRange: string){
+    return axios.get('/me/top/tracks', {params: {limit: userTopSongsLimit, time_range: timeRange}});
+}
+
+async function getUserTopArtists(timeRange: string){
+    return axios.get('/me/top/artists', {params: {time_range: timeRange}});
+}
+
+async function getCurrentUser(){
+    return axios.get('/me');
+}
+
+async function addSongsToPlaylist(playlistId: string, songIds: string[]){
+    if (songIds.length > playlistSongAddLimit) throw Error("Error! Cannot add more than 100 songs at a time to a Spotify playlist");
+
+    return axios.post(`/playlist/${playlistId}/tracks`, {uris: songIds});
+}
+
+async function createUserPlaylist(playlistName: string) {
+    try{
+        const curUser = (await getCurrentUser()).data;
+
+        const newPlaylist = {
+            name: playlistName,
+            description: `Playlist created for ${curUser.display_name} by DJ-Journey`,
+            public: false
+        }
+
+        return axios.post(`/users/${curUser.id}/playlists`, newPlaylist);
+    }
+    catch (error) {
+        console.error("Failed to create user playlist!", error);
+    }
+
 }
 
 
@@ -72,9 +111,19 @@ export async function generatePlaylist(tripDurationSeconds: number, spotifyToken
         }        
 
         // Create spotify playlist with these songs and return this playlist to the client
+        const playlistId = (await createUserPlaylist(tripName)).data.id;
 
-        return playlistToCreate;
+        // Add all songs from playlistToCreate into the playlist
+        // Need to break playlist songs list to chunks of 100 to add to playlist at a time due to Spotify API limit
+        const addSongsPromises = breakIntoChunks(playlistToCreate, playlistSongAddLimit).map(async (playlistChunkSongs) => {
+            return await addSongsToPlaylist(playlistId, playlistChunkSongs.map(song => song.uri));
+        });
 
+        await Promise.all(addSongsPromises);
+
+        // Pass playlist ID and any messages (e.g. success! playlist duration shorter than total trip duration) back to client side
+
+        // return createdPlaylist;
     }
     catch(error) {
         console.error("An error occured while generating the playlist!", error);
