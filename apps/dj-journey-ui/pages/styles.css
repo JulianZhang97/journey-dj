@@ -12,6 +12,12 @@ body {
   line-height: inherit;
   margin: 0;
 }
+.background-image{
+  height: 100vh;
+  /* background-image: url("https://cdn.pixabay.com/photo/2017/10/25/10/07/music-instruments-2887457_1280.jpg"); */
+  /* filter: grayscale(100%); */
+  background-size: cover;
+}
 h1,
 h2,
 p,

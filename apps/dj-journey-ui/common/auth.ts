@@ -1,6 +1,22 @@
 import axios from "axios";
 import router from "next/router";
-import { checkTokenExpiry, LOCALSTORAGE_KEYS } from "./utils";
+// import { checkTokenExpiry, LOCALSTORAGE_KEYS } from "./utils";
+
+
+export const LOCALSTORAGE_KEYS = {
+  accessToken: 'spotify_token',
+  refreshToken: 'spotify_refresh_token',
+  expireTime: 'spotify_token_expire_time',
+  timestamp: 'spotify_token_timestamp',
+}
+
+export const checkTokenExpiry = (expiryTime: string | undefined, timestamp: string | undefined) => {
+    if (!expiryTime || !timestamp) {
+      return false;
+    }
+    const millisecondsElapsed = Date.now() - Number(timestamp);
+    return (millisecondsElapsed / 1000) > Number(expiryTime);
+}
 
 
 
@@ -12,7 +28,6 @@ export const useToken = () => {
     const localTokenTimestamp = window.localStorage.getItem(LOCALSTORAGE_KEYS.timestamp);
 
     if (error || checkTokenExpiry(localTokenExpireTime, localTokenTimestamp) || localAccessToken === 'undefined'){
-      console.log("Invalid token found! Refreshing now...");
       refreshToken();
     }
     

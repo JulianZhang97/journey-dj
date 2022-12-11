@@ -26,9 +26,19 @@ export function UserMap(props: MapProps) {
   const [travelType, setTravelType] = useState<string>('mapbox/driving');
   const [tripName, setTripName] = useState<string>('My Travel Playlist');
 
+  // useEffect(() => {
+  //   console.log('origin is:', origin);
+  // }, [origin]);
+
+  // useEffect(() => {
+  //   console.log('destination is:', origin);
+  // }, [destination]);
+
   useEffect(() => {
-    console.log('origin is:', origin);
-  }, [origin]);
+    if(originName && destinationName){
+      setTripName(`Playlist for my trip from ${originName} to ${destinationName}`)
+    }
+  }, [originName, destinationName]);
 
   useEffect(() => {
     const originGeocoder = new MapboxGeocoder({
@@ -63,6 +73,8 @@ export function UserMap(props: MapProps) {
       spotifyToken,
       tripName,
     }
+    console.log(params);
+
     const tripRes = await axios.get(`${process.env.SERVER_URL}:${process.env.SERVER_PORT}/playlist`, { params });
 
     console.log(tripRes);

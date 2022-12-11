@@ -71,8 +71,7 @@ async function createUserPlaylist(
       description: `Playlist created for ${curUser.display_name} by DJ-Journey`,
       public: false,
     };
-
-    return axios.post(`/users/${curUser.id}/playlists`, newPlaylist);
+    return (await axios.post(`/users/${curUser.id}/playlists`, newPlaylist)).data;
   } catch (error) {
     console.error(`Failed to create user playlist with name ${playlistName}!`);
     catchAxiosError(error);
@@ -130,6 +129,8 @@ export async function generatePlaylist(
     });
 
     await Promise.all(addSongsPromises);
+
+    console.log("Playlist Created!");
 
     // Pass playlist ID and any messages (e.g. success! playlist duration shorter than total trip duration) back to client side
     return {
