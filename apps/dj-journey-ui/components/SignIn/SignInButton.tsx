@@ -4,8 +4,9 @@ export function SignInButton() {
         <div id="login">
         <a
           className="button-pill rounded shadow"
-          href={`${process.env.SERVER_URL}:${process.env.SERVER_PORT}/login`}
-          // target="_blank"
+          onClick={() => window.open(`${process.env.SERVER_URL}:${process.env.SERVER_PORT}/login`, "spotifyAuth", "height=700,width=400")}
+          // href={`${process.env.SERVER_URL}:${process.env.SERVER_PORT}/login`}
+          target="_blank"
           rel="noreferrer"
         >
         <svg

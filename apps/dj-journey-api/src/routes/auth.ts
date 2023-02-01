@@ -50,9 +50,7 @@ router.get('/callback', async function(req, res) {
                 refresh_token,
                 expires_in
             })
-
-            res.redirect(`${process.env.CLIENT_URL}:${process.env.CLIENT_PORT}/?${queryParams}`)
-
+            res.redirect(`${process.env.CLIENT_URL}:${process.env.CLIENT_PORT}/?${queryParams}`);
             // const userProfileRes = await axios.get('https://api.spotify.com/v1/me', {
             //     headers: {
             //     Authorization: `${token_type} ${access_token}`

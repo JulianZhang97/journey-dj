@@ -18,16 +18,38 @@ export const checkTokenExpiry = (expiryTime: string | undefined, timestamp: stri
     return (millisecondsElapsed / 1000) > Number(expiryTime);
 }
 
+export const closePopup = () => {
+  window.opener.location.reload();
+  window.close();
+}
+
+export const loadToken = () => {
+  const { access_token, refresh_token, expires_in, error} = router.query;
+
+  if (error){
+    refreshToken();
+  }
+
+  if (access_token){
+    console.log("User Logged In. Saving token to local storage")
+    window.localStorage.setItem(LOCALSTORAGE_KEYS.accessToken, access_token as string);
+    window.localStorage.setItem(LOCALSTORAGE_KEYS.refreshToken, refresh_token as string);
+    window.localStorage.setItem(LOCALSTORAGE_KEYS.expireTime, expires_in as string);
+    window.localStorage.setItem(LOCALSTORAGE_KEYS.timestamp, Date.now().toString());
+
+  }
+  closePopup();
+}
 
 
 export const useToken = () => {
-    const { access_token, refresh_token, expires_in, error} = router.query;
+    // console.log(window.localStorage)
     
     const localAccessToken = window.localStorage.getItem(LOCALSTORAGE_KEYS.accessToken);
     const localTokenExpireTime = window.localStorage.getItem(LOCALSTORAGE_KEYS.expireTime);
     const localTokenTimestamp = window.localStorage.getItem(LOCALSTORAGE_KEYS.timestamp);
 
-    if (error || checkTokenExpiry(localTokenExpireTime, localTokenTimestamp) || localAccessToken === 'undefined'){
+    if (checkTokenExpiry(localTokenExpireTime, localTokenTimestamp) || localAccessToken === 'undefined'){
       refreshToken();
     }
     
@@ -35,16 +57,8 @@ export const useToken = () => {
       console.log("Valid token found locally. Setting now...");
       return localAccessToken;
     }
-
-    
-    if (access_token){
-      console.log("User Logged In. Saving token to local storage")
-      window.localStorage.setItem(LOCALSTORAGE_KEYS.accessToken, access_token as string);
-      window.localStorage.setItem(LOCALSTORAGE_KEYS.refreshToken, refresh_token as string);
-      window.localStorage.setItem(LOCALSTORAGE_KEYS.expireTime, expires_in as string);
-      window.localStorage.setItem(LOCALSTORAGE_KEYS.timestamp, Date.now().toString());
-      
-      return access_token;
+    else {
+      console.log("Token not found in local storage! Please login");
     }
 }
   
@@ -80,6 +94,7 @@ export const refreshToken = async () => {
 export const logOut = () => {
     for (const property in LOCALSTORAGE_KEYS) {
       window.localStorage.removeItem(LOCALSTORAGE_KEYS[property]);
+      location.reload();
     }
     // window.location = window.location.origin;
   }

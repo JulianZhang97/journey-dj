@@ -1,44 +1,51 @@
 import styles from './index.module.scss';
 import React, { useEffect, useState } from 'react';
-import SignIn from '../components/SignIn/SignIn';
-import { useToken } from '../common/auth';
+import { useToken, logOut, loadToken } from '../common/auth';
 import { getCurrentUserProfile } from '../common/spotify';
 import UserMap from '../components/UserMap';
+import SignInButton from '../components/SignIn/SignInButton';
+import {useRouter} from "next/router";
+
 //nx serve dj-journey-ui
 
 export function Index() {
+  const {query, isReady} = useRouter();
+
   const [token, setToken] = useState(null);
   const [profile, setProfile] = useState(null);
 
   useEffect(() => {
+    if (token){
+      const fetchData = async () => {
+        setProfile(await getCurrentUserProfile(token));
+      };
+  
+      fetchData();
+    }
+  }, [token])
+
+  useEffect(() => {
+    if(isReady && query.access_token){
+      console.log("Token detected in query params...loading");
+      loadToken();
+    }
     setToken(useToken);
 
-    const fetchData = async () => {
-      setProfile(await getCurrentUserProfile());
-    };
+  }, [isReady]);
 
-    fetchData();
-  }, []);
 
-  /*
-   * Replace the elements below with your own.
-   *
-   * Note: The corresponding styles are in the ./index.scss file.
-   */
   return (
     <div className={styles.page}>
-      <div className="background-image">
+      <div>
         <div className="wrapper">
           <div className="container">
             <div id="welcome">
-              <h1>
-                <span> Hello there, </span>
-                Welcome to DJ Journey👋
-              </h1>
+              <div className="titleContainer"><p className="titleText"> Hello there, </p></div>
+              <div className="titleContainer"><h1 className="titleText2">Welcome to DJ Journey 👋</h1></div>
             </div>
           </div>
           <div className="container">
-            <SignIn accessToken={token} />
+            {profile ? <h1>Signed in to Spotify!</h1> : <SignInButton/> }
           </div>
           {profile && (
             <div>
@@ -46,6 +53,7 @@ export function Index() {
               <UserMap spotifyToken={token} />
             </div>
           )}
+          <button onClick={logOut}>LOGOUT</button>
         </div>
       </div>
     </div>
