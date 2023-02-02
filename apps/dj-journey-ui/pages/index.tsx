@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useToken, logOut, loadToken } from '../common/auth';
 import { getCurrentUserProfile } from '../common/spotify';
-import UserMap from '../components/UserMap';
 import SignInButton from '../components/SignInButton';
 import { useRouter } from 'next/router';
 import CreatePlaylist from '../components/CreatePlaylist';
