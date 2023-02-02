@@ -1,60 +1,69 @@
-import styles from './index.module.scss';
 import React, { useEffect, useState } from 'react';
 import { useToken, logOut, loadToken } from '../common/auth';
 import { getCurrentUserProfile } from '../common/spotify';
 import UserMap from '../components/UserMap';
-import SignInButton from '../components/SignIn/SignInButton';
-import {useRouter} from "next/router";
+import SignInButton from '../components/SignInButton';
+import { useRouter } from 'next/router';
+import CreatePlaylist from '../components/CreatePlaylist';
 
 //nx serve dj-journey-ui
 
 export function Index() {
-  const {query, isReady} = useRouter();
+  const { query, isReady } = useRouter();
 
   const [token, setToken] = useState(null);
   const [profile, setProfile] = useState(null);
 
   useEffect(() => {
-    if (token){
+    if (token) {
       const fetchData = async () => {
         setProfile(await getCurrentUserProfile(token));
       };
-  
+
       fetchData();
     }
-  }, [token])
+  }, [token]);
 
   useEffect(() => {
-    if(isReady && query.access_token){
-      console.log("Token detected in query params...loading");
+    if (isReady && query.access_token) {
+      console.log('Token detected in query params...loading');
       loadToken();
     }
     setToken(useToken);
-
   }, [isReady]);
 
-
   return (
-    <div className={styles.page}>
-      <div>
-        <div className="wrapper">
-          <div className="container">
-            <div id="welcome">
-              <div className="titleContainer"><p className="titleText"> Hello there, </p></div>
-              <div className="titleContainer"><h1 className="titleText2">Welcome to DJ Journey 👋</h1></div>
-            </div>
+    <div>
+      <div className="wrapper">
+        <div className="container headerContainer">
+        <div id="welcomeImage">
+                <img src="https://cdn-icons-png.flaticon.com/128/7306/7306093.png" />
           </div>
-          <div className="container">
-            {profile ? <h1>Signed in to Spotify!</h1> : <SignInButton/> }
-          </div>
-          {profile && (
-            <div>
-              <h1>Welcome Back {profile.display_name}!</h1>
-              <UserMap spotifyToken={token} />
+         {!profile && (<div>
+              <div className="headerText">
+                <div>
+                  <p className="welcomeText title"> Hello there, </p>
+                </div>
+                <div>
+                  <h1 className="welcomeText title2">Welcome to DJ Journey 👋</h1>
+                </div>
+              </div>
             </div>
           )}
-          <button onClick={logOut}>LOGOUT</button>
+          {profile &&(
+            <div className="headerText"> 
+              <h1 className="title2">Welcome Back {profile.display_name}!</h1>
+              <p className="title centerText">Let's make a playlist...</p>
+            </div>
+          )}
         </div>
+        {!profile && (
+          <div className="container buttonContainer">{<SignInButton />}</div>
+        )}
+        {profile && (
+            <CreatePlaylist spotifyToken={token}/>
+        )}
+        <button onClick={logOut}>LOGOUT</button>
       </div>
     </div>
   );

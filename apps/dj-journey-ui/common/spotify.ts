@@ -1,11 +1,12 @@
 import axios from "axios";
+import { PlaylistParams } from "../components/CreatePlaylist";
 import { LOCALSTORAGE_KEYS } from "./auth";
 
 axios.defaults.baseURL = 'https://api.spotify.com/v1';
 axios.defaults.headers['Content-Type'] = 'application/json';
 
 
-export async function getCurrentUserProfile(localAccessToken){
+export const getCurrentUserProfile = async (localAccessToken: string) => {
     try{
         console.log("Fetching User Profile")
         if (localAccessToken === (null || undefined)) {
@@ -19,3 +20,11 @@ export async function getCurrentUserProfile(localAccessToken){
         console.error("Failed to fetch user profile", error);
     }
 };
+
+export const createPlaylist = async (params: PlaylistParams) => {
+    console.log(params);
+    
+    const tripRes = await axios.get(`${process.env.SERVER_URL}:${process.env.SERVER_PORT}/playlist`, { params });
+
+    console.log(tripRes);
+}

@@ -42,40 +42,30 @@ svg {
   shape-rendering: auto;
   text-rendering: optimizeLegibility;
 }
-.titleContainer{
+.welcomeText{
   display: inline-block;
-  color: white;
-}
-
-
-.titleText {
-  font-size: 1.875rem;
-  font-weight: 300;
-  line-height: 2.25rem;
-  margin-bottom: 0.5rem;
   overflow: hidden;
   white-space: nowrap;
   width: 0; 
+  margin-bottom: 0.5rem;
   animation: typing;
-  animation-duration: 2.5s;
   animation-timing-function: steps(30, end);
   animation-fill-mode: forwards;
+  animation-duration: 2.0s;
 }
-.titleText2 {
+
+
+.title {
+  font-size: 1.875rem;
+  font-weight: 300;
+  line-height: 2.25rem;
+}
+.title2 {
   font-size: 3rem;
   font-weight: 500;
   letter-spacing: -0.025em;
   line-height: 1;
-
-  margin-bottom: 0.5rem;
-  overflow: hidden;
-  white-space: nowrap;
-  width: 0; 
-  animation: typing;
-  animation-delay: 1.5s;
-  animation-duration: 2.5s;
-  animation-timing-function: steps(30, end);
-  animation-fill-mode: forwards;
+  animation-delay: 1.0s;
 }
 
 @keyframes typing {
@@ -96,17 +86,42 @@ svg {
 .container {
   margin-left: auto;
   margin-right: auto;
+  margin-bottom: 1rem;
   max-width: 768px;
   padding-bottom: 3rem;
   padding-left: 1rem;
   padding-right: 1rem;
-  color: rgba(55, 65, 81, 1);
   width: 100%;
 }
-#welcome {
+.headerContainer {
+  min-height: 300px;
+  height: 100%;
+  margin-top: 2rem; 
+}
+.buttonContainer {
+  opacity: 0;
+  /* margin-left: 5.5rem; */
+  animation: fadeIn;
+  animation-delay: 3s;
+  animation-duration: 1.0s;
+  animation-timing-function: steps(30, end);
+  animation-fill-mode: forwards;
+}
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+#welcomeImage{
+  filter: invert(100%);
+  display: flex;
+  justify-content: center;
+}
+.headerText {
   margin-top: 2.5rem;
+  margin-left: 6.5rem;
   display: flex;
   flex-direction: column;
+  color: white;
 }
 #welcome h1 {
   font-size: 3rem;
@@ -114,13 +129,11 @@ svg {
   letter-spacing: -0.025em;
   line-height: 1;
 }
-/* #welcome span {
-  display: block;
-  font-size: 1.875rem;
-  font-weight: 300;
-  line-height: 2.25rem;
-  margin-bottom: 0.5rem;
-} */
+
+.centerText{
+  text-align: center;
+  text-indent: -100px;
+}
 
 .button-pill { 
   color: rgba(255, 255, 255, 0.668) !important;
@@ -163,3 +176,53 @@ svg {
   filter: grayscale(0%);
   color: rgba(255, 255, 255, 1) !important;
 }
+
+.playlistButton {
+  min-width: 150px;
+  text-align: center;
+  font-size: 1rem;
+
+}
+.playlistButtons {
+  width: 100%;
+  /* background-color: red; */
+  display: flex;
+  justify-content: space-around;
+
+}
+
+.mapContainer{
+  display: flex;
+}
+
+.addressContainer{
+  /* flex-grow: 3; */
+  /* background-color: red; */
+  display: flex;
+  margin: 10px;
+  flex-direction: column;
+  align-items: center;
+  /* background: lightblue; */
+  
+}
+
+#addressBox{
+  width: 100%;
+  color: #00337C;
+  background-color: #00337C;
+  /* margin: 100px; */
+}
+.prompt{
+  text-align: center;
+  color: white;
+  font-size: 1.5rem;
+  font-weight: 300;
+  line-height: 2.25rem;
+  margin-top: 20px;
+  margin-bottom: 30px;
+  /* animation: fadeIn;
+  animation-duration: 0.5s;
+  animation-timing-function: steps(30, end);
+  animation-fill-mode: forwards; */
+}
+

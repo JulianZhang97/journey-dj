@@ -1,5 +1,6 @@
 import axios from "axios";
 import router from "next/router";
+import { checkTokenExpiry, closePopup } from "./utils";
 // import { checkTokenExpiry, LOCALSTORAGE_KEYS } from "./utils";
 
 
@@ -10,18 +11,6 @@ export const LOCALSTORAGE_KEYS = {
   timestamp: 'spotify_token_timestamp',
 }
 
-export const checkTokenExpiry = (expiryTime: string | undefined, timestamp: string | undefined) => {
-    if (!expiryTime || !timestamp) {
-      return false;
-    }
-    const millisecondsElapsed = Date.now() - Number(timestamp);
-    return (millisecondsElapsed / 1000) > Number(expiryTime);
-}
-
-export const closePopup = () => {
-  window.opener.location.reload();
-  window.close();
-}
 
 export const loadToken = () => {
   const { access_token, refresh_token, expires_in, error} = router.query;
