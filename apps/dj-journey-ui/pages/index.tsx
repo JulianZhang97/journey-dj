@@ -62,7 +62,7 @@ export function Index() {
         {profile && (
             <CreatePlaylist spotifyToken={token}/>
         )}
-        <button onClick={logOut}>LOGOUT</button>
+        <button className="button-pill" onClick={logOut}>Logout</button>
       </div>
     </div>
   );

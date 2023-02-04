@@ -35,6 +35,12 @@ const promptMap = {
   4: 'Playlist Created! Take a look below:',
 };
 
+const travelTypeMap = {
+  'mapbox/cycling': 'Cycling',
+  'mapbox/driving-traffic': 'Driving',
+  'mapbox/walking': 'Walking',
+};
+
 export function CreatePlaylist(props: CreatePlaylistProps) {
   const { spotifyToken } = props;
   const [step, setStep] = useState<number>(0);
@@ -136,6 +142,7 @@ export function CreatePlaylist(props: CreatePlaylistProps) {
           setDestinationName(input.result.place_name);
         }
         locationGeocoder.clear();
+        nextStep();
       });
     }
   }, [step]);
@@ -182,13 +189,58 @@ export function CreatePlaylist(props: CreatePlaylistProps) {
           />
         )}
       </div>
-      {step === Object.keys(stepMap).length - 1 && (
+      {/* {step === Object.keys(stepMap).length - 1 && (
         <UserMap
           spotifyToken={spotifyToken}
           origin={origin}
           destination={destination}
         />
-      )}
+      )} */}
+      <div className="resultsContainer">
+        {travelType && (
+          <div className="resultsButtonContainer">
+          <button className="button-pill rounded light-blue-button">
+            <span>
+              <span>I will be travelling by</span>
+              {travelTypeMap[travelType]}
+            </span>
+          </button>
+        </div>
+        )}
+        {originName && (
+          <div className="resultsButtonContainer">
+            {/* <div className="resultsLine"/> */}
+            <button className="button-pill rounded light-blue-button">
+              <span>
+                <span>I will be leaving from</span>
+                {originName}
+              </span>
+            </button>
+          </div>
+        )}
+        {destinationName && (
+          <div className="resultsButtonContainer">
+            <div />
+            <button className="button-pill rounded light-blue-button">
+              <span>
+                <span>I will be travelling to</span>
+                {destinationName}
+              </span>
+            </button>
+          </div>
+        )}
+        {playlistName && (
+          <div className="resultsButtonContainer">
+            <div />
+            <button className="button-pill rounded light-blue-button">
+              <span>
+                <span>My playlist will be called</span>
+                {playlistName}
+              </span>
+            </button>
+          </div>
+        )}
+      </div>
       <div className="playlistButtons">
         {step !== 0 && (
           <button
@@ -198,29 +250,13 @@ export function CreatePlaylist(props: CreatePlaylistProps) {
             Back
           </button>
         )}
-        {step !== Object.keys(stepMap).length - 1 && (
+        {step === Object.keys(stepMap).length - 2 && (
           <button
             onClick={nextStep}
             className="button-pill rounded playlistButton"
           >
-            {step === Object.keys(stepMap).length - 2
-              ? `Create Playlist`
-              : `Next`}
+            Create Playlist
           </button>
-        )}
-      </div>
-      <div className="resultsContainer">
-        {travelType && (
-          <button className="button-pill rounded">{travelType}</button>
-        )}
-        {originName && (
-          <button className="button-pill rounded">{originName}</button>
-        )}
-        {destinationName && (
-          <button className="button-pill rounded">{destinationName}</button>
-        )}
-        {playlistName && (
-          <button className="button-pill rounded">{playlistName}</button>
         )}
       </div>
     </div>

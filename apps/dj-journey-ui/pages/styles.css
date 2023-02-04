@@ -135,6 +135,10 @@ svg {
   text-indent: -100px;
 }
 
+.light-blue-button {
+  background-color: #1C82AD !important;
+}
+
 .button-pill { 
   color: rgba(255, 255, 255, 0.668) !important;
   background-color: #00337C;
@@ -178,7 +182,7 @@ svg {
 }
 
 .playlistButton {
-  min-width: 150px;
+  /* min-width: 150px; */
   height: 32px;
   text-align: center;
   font-size: 1rem;
@@ -186,7 +190,6 @@ svg {
 }
 .playlistButtons {
   width: 100%;
-  /* background-color: red; */
   display: flex;
   justify-content: space-around;
 
@@ -199,11 +202,10 @@ svg {
 .responseContainer{
   /* flex-grow: 3; */
   display: flex;
-  margin: 10px;
+  /* margin: 10px; */
   flex-direction: column;
   align-items: center;
   margin-bottom: 40px;
-  min-height: 75px;
   
 }
 
@@ -244,8 +246,24 @@ svg {
   border-radius: 1.5rem !important;
 }
 .mapboxgl-ctrl-geocoder--input{
+  color: white !important;
 }
 
 .resultsContainer {
+  margin: 25px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   
+}
+
+.resultsButtonContainer {
+  margin: 15px;
+}
+
+.resultsLine {
+  height: 25px;
+  width: 5px;
+  border: 2px solid white;
 }
