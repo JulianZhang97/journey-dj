@@ -1,6 +1,6 @@
 import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
 import { useEffect, useState } from 'react';
-import {Map, Layer, LayerProps } from 'react-map-gl';
+import {Map, Layer, LayerProps, Source } from 'react-map-gl';
 import { convertDurationSecondsToStr } from '../common/utils';
 
 interface MapProps {
@@ -12,6 +12,7 @@ export function UserMap(props: MapProps) {
   const { tripDuration, tripInfo } = props;
 
   const [routeDataLayerProps, setRouteDataLayerProps] = useState<any>();
+  const [geoJSON, setGeoJSON] = useState<any>();
 
     useEffect(() => {
       const route = tripInfo.geometry.coordinates;
@@ -23,6 +24,7 @@ export function UserMap(props: MapProps) {
           coordinates: route
         }
       };
+      setGeoJSON(geojson);
       const routeProps = {
         id: 'route',
         type: 'line',
@@ -59,7 +61,9 @@ export function UserMap(props: MapProps) {
           mapStyle="mapbox://styles/mapbox/streets-v12"
           mapboxAccessToken={process.env.MAPBOX_TOKEN}
         >
-          <Layer {...routeDataLayerProps} />
+          {geoJSON && routeDataLayerProps && <Source type="geojson" data={geoJSON}>
+            <Layer {...routeDataLayerProps} />
+          </Source>}
           </Map>
       </div>
     </div>
