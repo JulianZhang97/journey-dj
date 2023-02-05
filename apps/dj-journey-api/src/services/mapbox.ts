@@ -1,26 +1,26 @@
 import axios from 'axios';
 
 
-export async function getTripDuration(origin: string, destination: string, travelType: string): Promise<number>{
+export async function getTripDuration(origin: string, destination: string, travelType: string): Promise<{tripDuration: number, tripInfo}>{
     try{    
         const tripPoints = encodeURIComponent(`${origin};${destination}`);
-        const reqURL = `${process.env.MAPBOX_MATRIX_URL}/${travelType}/${tripPoints}`;
+        const reqURL = `${process.env.MAPBOX_MATRIX_URL}/${travelType}/${tripPoints}?steps=true&geometries=geojson`;
 
-        // console.log(reqURL);
         const accessToken = process.env.MAPBOX_TOKEN
         const params = {
             access_token: accessToken
         }
 
-        const tripInfo = (await axios.get(reqURL, {params})).data;
-        const tripDuration = tripInfo.routes[0].legs[0].duration;
-        console.log(`Estimated trip duration is ${tripDuration} seconds. Creating playlist now...`)
+        const tripRes = (await axios.get(reqURL, {params})).data;
+        const tripDuration = tripRes.routes[0].duration;
+        const tripInfo = tripRes.routes[0];
         
-        return tripDuration;
+        return {tripDuration, tripInfo};
 
     }
     catch(error){
-        console.error("An error occured!", error.response);
+        const errorObj = error.response && error.response.data ? JSON.stringify(error.response.data) : "";
+        throw Error("An error occured! " + errorObj);
     } 
 }
 

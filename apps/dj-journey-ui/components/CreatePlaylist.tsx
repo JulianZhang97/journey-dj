@@ -4,7 +4,6 @@ import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
 import { useEffect, useState } from 'react';
 import { createPlaylist } from '../common/spotify';
 import { setAddressResult } from '../common/utils';
-import styles from '../pages/index.module.scss';
 import UserMap from './UserMap';
 
 export interface PlaylistParams {
@@ -17,6 +16,19 @@ export interface PlaylistParams {
 
 interface CreatePlaylistProps {
   spotifyToken: string;
+}
+
+interface PlaylistInfo {
+  message: string;
+  playlistDurationSeconds: number;
+  playlistId: string;
+  playlistLength: number;
+}
+
+export interface PlaylistRes {
+  tripDuration: number;
+  playlist: PlaylistInfo;
+  tripInfo: any;
 }
 
 const stepMap = {
@@ -45,13 +57,22 @@ export function CreatePlaylist(props: CreatePlaylistProps) {
   const { spotifyToken } = props;
   const [step, setStep] = useState<number>(0);
 
+  // const [origin, setOrigin] = useState<number[]>([-79.383935, 43.653482]);
   const [origin, setOrigin] = useState<number[]>(null);
-  const [originName, setOriginName] = useState<string>();
+  // const [destination, setDestination] = useState<number[]>([
+  //   -75.690057, 45.421143
+  // ]);
   const [destination, setDestination] = useState<number[]>(null);
+
+  const [originName, setOriginName] = useState<string>();
   const [destinationName, setDestinationName] = useState<string>();
 
   const [travelType, setTravelType] = useState<string>(null);
   const [playlistName, setPlaylistName] = useState<string>(null);
+
+  const [tripDuration, setTripDuration] = useState<number>(null);
+  const [playlistInfo, setPlaylistInfo] = useState<PlaylistInfo>(null);
+  const [tripInfo, setTripInfo] = useState(null);
 
   //   useEffect(() => {
   //     console.log('Current Step Is', step);
@@ -59,9 +80,9 @@ export function CreatePlaylist(props: CreatePlaylistProps) {
 
   function nextStep() {
     // TODO: Enable this when fixes are done
-    // if (step === Object.keys(stepMap).length - 2){
-    //     loadPlaylist();
-    // }
+    if (step === Object.keys(stepMap).length - 2) {
+      loadPlaylist();
+    }
 
     if (step <= Object.keys(stepMap).length - 2) {
       removeGeoCoderBox();
@@ -73,6 +94,18 @@ export function CreatePlaylist(props: CreatePlaylistProps) {
       removeGeoCoderBox();
       setStep(step - 1);
     }
+  }
+
+  function startOver() {
+    setStep(0);
+    setOrigin(null);
+    setDestination(null);
+    setOriginName(null);
+    setDestination(null);
+    setTravelType(null);
+    setPlaylistName(null);
+    setTripDuration(null);
+    setPlaylistInfo(null);
   }
 
   // Need to do this as the Geocoder box won't unrender otherwise
@@ -93,14 +126,6 @@ export function CreatePlaylist(props: CreatePlaylistProps) {
     setTravelType(travelType);
     nextStep();
   }
-
-  //   useEffect(() => {
-  //     if (originName && destinationName) {
-  //       setPlaylistName(
-  //         `Playlist for my trip from ${originName} to ${destinationName}`
-  //       );
-  //     }
-  //   }, [originName, destinationName]);
 
   async function loadPlaylist() {
     if (
@@ -124,7 +149,15 @@ export function CreatePlaylist(props: CreatePlaylistProps) {
       spotifyToken,
       playlistName,
     };
-    createPlaylist(params);
+    try {
+      const res = await createPlaylist(params);
+      console.log(res);
+      setTripDuration(res.tripDuration);
+      setPlaylistInfo(res.playlist);
+      setTripInfo(res.tripInfo);
+    } catch (error) {
+      console.error('Could not create playlist!', error);
+    }
   }
 
   useEffect(() => {
@@ -134,6 +167,7 @@ export function CreatePlaylist(props: CreatePlaylistProps) {
       });
       locationGeocoder.addTo('#addressBox');
       locationGeocoder.on('result', (input) => {
+        console.log(input.result.center);
         if (stepMap[step] === 'origin') {
           setOrigin(input.result.center);
           setOriginName(input.result.place_name);
@@ -189,60 +223,68 @@ export function CreatePlaylist(props: CreatePlaylistProps) {
           />
         )}
       </div>
-      {/* {step === Object.keys(stepMap).length - 1 && (
-        <UserMap
-          spotifyToken={spotifyToken}
-          origin={origin}
-          destination={destination}
-        />
-      )} */}
-      <div className="resultsContainer">
-        {travelType && (
-          <div className="resultsButtonContainer">
-          <button className="button-pill rounded light-blue-button">
-            <span>
-              <span>I will be travelling by</span>
-              {travelTypeMap[travelType]}
-            </span>
-          </button>
+      {tripDuration && (
+        <div>
+          {tripDuration && tripInfo && playlistInfo && (
+            <div className="resultsContainer">
+              <UserMap
+                tripDuration={tripDuration}
+                tripInfo={tripInfo}
+              />
+              <h1 className="prompt">This is your playlist:</h1>
+              <iframe src={`https://open.spotify.com/embed/playlist/${playlistInfo.playlistId}?utm_source=generator`} width="100%" height="352" frameBorder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+            </div>
+          )}
         </div>
-        )}
-        {originName && (
-          <div className="resultsButtonContainer">
-            {/* <div className="resultsLine"/> */}
-            <button className="button-pill rounded light-blue-button">
-              <span>
-                <span>I will be leaving from</span>
-                {originName}
-              </span>
-            </button>
-          </div>
-        )}
-        {destinationName && (
-          <div className="resultsButtonContainer">
-            <div />
-            <button className="button-pill rounded light-blue-button">
-              <span>
-                <span>I will be travelling to</span>
-                {destinationName}
-              </span>
-            </button>
-          </div>
-        )}
-        {playlistName && (
-          <div className="resultsButtonContainer">
-            <div />
-            <button className="button-pill rounded light-blue-button">
-              <span>
-                <span>My playlist will be called</span>
-                {playlistName}
-              </span>
-            </button>
-          </div>
-        )}
-      </div>
+      )}
+      {step !== Object.keys(stepMap).length - 1 && (
+        <div className="tripInfoContainer">
+          {travelType && (
+            <div className="tripInfoButtonContainer">
+              <button className="button-pill rounded light-blue-button">
+                <span>
+                  <span>I will be travelling by</span>
+                  {travelTypeMap[travelType]}
+                </span>
+              </button>
+            </div>
+          )}
+          {originName && (
+            <div className="tripInfoButtonContainer">
+              <button className="button-pill rounded light-blue-button">
+                <span>
+                  <span>I will be leaving from</span>
+                  {originName}
+                </span>
+              </button>
+            </div>
+          )}
+          {destinationName && (
+            <div className="tripInfoButtonContainer">
+              <div />
+              <button className="button-pill rounded light-blue-button">
+                <span>
+                  <span>I will be travelling to</span>
+                  {destinationName}
+                </span>
+              </button>
+            </div>
+          )}
+          {playlistName && (
+            <div className="tripInfoButtonContainer">
+              <div />
+              <button className="button-pill rounded light-blue-button">
+                <span>
+                  <span>My playlist will be called</span>
+                  {playlistName}
+                </span>
+              </button>
+            </div>
+          )}
+        </div>
+      )}
       <div className="playlistButtons">
-        {step !== 0 && (
+        {step !== 0 && step <= Object.keys(stepMap).length - 2 && (
           <button
             onClick={prevStep}
             className="button-pill rounded playlistButton"
@@ -256,6 +298,14 @@ export function CreatePlaylist(props: CreatePlaylistProps) {
             className="button-pill rounded playlistButton"
           >
             Create Playlist
+          </button>
+        )}
+        {step === Object.keys(stepMap).length - 1 && (
+          <button
+            onClick={startOver}
+            className="button-pill rounded playlistButton"
+          >
+            Start Over
           </button>
         )}
       </div>

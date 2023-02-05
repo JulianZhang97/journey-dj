@@ -1,33 +1,67 @@
-import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
 import { useEffect, useState } from 'react';
-import Map from 'react-map-gl';
-// import styles from '../pages/index.module.scss';
-
+import {Map, Layer, LayerProps } from 'react-map-gl';
+import { convertDurationSecondsToStr } from '../common/utils';
 
 interface MapProps {
-  spotifyToken: string
-  origin: number[],
-  destination: number[] 
+  tripDuration: number;
+  tripInfo: any;
 }
 
-
-
 export function UserMap(props: MapProps) {
-  const { spotifyToken, origin, destination } = props;
+  const { tripDuration, tripInfo } = props;
+
+  const [routeDataLayerProps, setRouteDataLayerProps] = useState<any>();
+
+    useEffect(() => {
+      const route = tripInfo.geometry.coordinates;
+      const geojson = {
+        type: 'Feature',
+        properties: {},
+        geometry: {
+          type: 'LineString',
+          coordinates: route
+        }
+      };
+      const routeProps = {
+        id: 'route',
+        type: 'line',
+        source: {
+          type: 'geojson',
+          data: geojson
+        },
+        layout: {
+          'line-join': 'round',
+          'line-cap': 'round'
+        },
+        paint: {
+          "line-color": '#3887be',
+          'line-width': 5,
+          'line-opacity': 0.75
+        }
+      }
+      setRouteDataLayerProps(routeProps);
+    }, [tripInfo]);  
 
   return (
-    <div className="mapContainer">
-      {origin && destination && <Map 
-        initialViewState={{
-          longitude: -100,
-          latitude: 40,
-          zoom: 1.0
-        }}
-        style={{width: 500, height: 300}}
-        mapStyle="mapbox://styles/mapbox/streets-v11"
-        mapboxAccessToken={process.env.MAPBOX_TOKEN}
-      />}
+    <div>
+      <h1 className="prompt">
+        Your trip will take about {convertDurationSecondsToStr(tripDuration)}
+      </h1>
+      <div className="mapContainer">
+        <Map
+          initialViewState={{
+            longitude: -100,
+            latitude: 40,
+            zoom: 1.0,
+          }}
+          style={{ width: 500, height: 300 }}
+          mapStyle="mapbox://styles/mapbox/streets-v12"
+          mapboxAccessToken={process.env.MAPBOX_TOKEN}
+        >
+          <Layer {...routeDataLayerProps} />
+          </Map>
+      </div>
     </div>
   );
 }

@@ -81,7 +81,7 @@ async function createUserPlaylist(
 export async function generatePlaylist(
   tripDurationSeconds: number,
   spotifyToken: string,
-  tripName: string
+  playlistName: string
 ): Promise<PlaylistCreateResponse> {
   axios.defaults.headers['Authorization'] = `Bearer ${spotifyToken}`;
 
@@ -112,7 +112,7 @@ export async function generatePlaylist(
     }
 
     // Create spotify playlist with these songs and return this playlist to the client
-    const playlistId = (await createUserPlaylist(tripName)).id;
+    const playlistId = (await createUserPlaylist(playlistName)).id;
 
     // Add all songs from playlistToCreate into the playlist
     // Need to break playlist songs list to chunks of 100 to add to playlist at a time due to Spotify API limit
@@ -135,7 +135,7 @@ export async function generatePlaylist(
     // Pass playlist ID and any messages (e.g. success! playlist duration shorter than total trip duration) back to client side
     return {
       playlistId,
-      message: `Playlist ${tripName} successfully created.`,
+      message: `Playlist ${playlistName} successfully created.`,
       playlistLength: playlistToCreate.length,
       playlistDurationSeconds: playlistTotalDurationSeconds,
     } as PlaylistCreateResponse;

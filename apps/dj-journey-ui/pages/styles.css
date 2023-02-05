@@ -197,6 +197,7 @@ svg {
 
 .mapContainer{
   display: flex;
+  margin-bottom: 65px;
 }
 
 .responseContainer{
@@ -249,7 +250,7 @@ svg {
   color: white !important;
 }
 
-.resultsContainer {
+.tripInfoContainer {
   margin: 25px;
   display: flex;
   flex-direction: column;
@@ -258,12 +259,15 @@ svg {
   
 }
 
-.resultsButtonContainer {
+.tripInfoButtonContainer {
   margin: 15px;
 }
 
-.resultsLine {
-  height: 25px;
-  width: 5px;
-  border: 2px solid white;
+.resultsContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 25px;
+  /* margin: 50px; */
 }

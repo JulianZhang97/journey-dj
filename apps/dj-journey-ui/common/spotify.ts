@@ -1,6 +1,5 @@
 import axios from "axios";
-import { PlaylistParams } from "../components/CreatePlaylist";
-import { LOCALSTORAGE_KEYS } from "./auth";
+import { PlaylistParams, PlaylistRes } from "../components/CreatePlaylist";
 
 axios.defaults.baseURL = 'https://api.spotify.com/v1';
 axios.defaults.headers['Content-Type'] = 'application/json';
@@ -21,10 +20,13 @@ export const getCurrentUserProfile = async (localAccessToken: string) => {
     }
 };
 
-export const createPlaylist = async (params: PlaylistParams) => {
+export const createPlaylist = async (params: PlaylistParams): Promise<PlaylistRes> => {
     console.log(params);
-    
-    const tripRes = await axios.get(`${process.env.SERVER_URL}:${process.env.SERVER_PORT}/playlist`, { params });
-
-    console.log(tripRes);
+    try{
+        const tripRes = await axios.get(`${process.env.SERVER_URL}:${process.env.SERVER_PORT}/playlist`, { params });
+        return tripRes.data;
+    }
+    catch(error){
+        console.error("Failed to create playlist", error);
+    }
 }
