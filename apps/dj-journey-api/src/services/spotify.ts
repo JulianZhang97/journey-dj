@@ -1,10 +1,5 @@
-import axios, { AxiosResponse } from 'axios';
-import {
-  TopTrack,
-  TopTrackWithId,
-  TopTrackDict,
-  PlaylistCreateResponse,
-} from 'libs/types';
+import axios from 'axios';
+import { CreatedPlaylistData, SpotifyCreatePlaylistRequest, TopTrack, TopTrackDict, TopTrackWithId } from 'types';
 import { playlistSongAddLimit, userTopSongsLimit } from '../constants';
 import {
   breakIntoChunks,
@@ -66,7 +61,7 @@ async function createUserPlaylist(
   try {
     const curUser = await getCurrentUser();
 
-    const newPlaylist = {
+    const newPlaylist: SpotifyCreatePlaylistRequest = {
       name: playlistName,
       description: `Playlist created for ${curUser.display_name} by DJ-Journey`,
       public: false,
@@ -82,7 +77,7 @@ export async function generatePlaylist(
   tripDurationSeconds: number,
   spotifyToken: string,
   playlistName: string
-): Promise<PlaylistCreateResponse> {
+): Promise<CreatedPlaylistData> {
   axios.defaults.headers['Authorization'] = `Bearer ${spotifyToken}`;
 
   try {
@@ -138,7 +133,7 @@ export async function generatePlaylist(
       message: `Playlist ${playlistName} successfully created.`,
       playlistLength: playlistToCreate.length,
       playlistDurationSeconds: playlistTotalDurationSeconds,
-    } as PlaylistCreateResponse;
+    } as CreatedPlaylistData;
   } catch (error) {
     console.error('An error occured while generating the playlist!', error);
   }

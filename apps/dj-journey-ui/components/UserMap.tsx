@@ -1,21 +1,18 @@
 import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
 import { useEffect, useState } from 'react';
 import {Map, Layer, LayerProps, Source } from 'react-map-gl';
+import { MapProps } from 'types';
 import { convertDurationSecondsToStr } from '../common/utils';
 
-interface MapProps {
-  tripDuration: number;
-  tripInfo: any;
-}
 
 export function UserMap(props: MapProps) {
-  const { tripDuration, tripInfo } = props;
+  const { tripData } = props;
 
   const [routeDataLayerProps, setRouteDataLayerProps] = useState<any>();
   const [geoJSON, setGeoJSON] = useState<any>();
 
     useEffect(() => {
-      const route = tripInfo.geometry.coordinates;
+      const route = tripData.tripInfo.geometry.coordinates;
       const geojson = {
         type: 'Feature',
         properties: {},
@@ -43,12 +40,12 @@ export function UserMap(props: MapProps) {
         }
       }
       setRouteDataLayerProps(routeProps);
-    }, [tripInfo]);  
+    }, [tripData]);  
 
   return (
     <div>
       <h1 className="prompt">
-        Your trip will take about {convertDurationSecondsToStr(tripDuration)}
+        Your trip will take about {convertDurationSecondsToStr(tripData.tripDuration)}
       </h1>
       <div className="mapContainer">
         <Map

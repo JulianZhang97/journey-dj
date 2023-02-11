@@ -1,5 +1,5 @@
 import { AxiosError } from "axios";
-import { TopTrack, TopTrackWithId } from "libs/types";
+import { TopTrack, TopTrackWithId } from "types";
 
 export function getTopItemInfo(playListItem: SpotifyApi.TrackObjectFull): TopTrackWithId {
     return {

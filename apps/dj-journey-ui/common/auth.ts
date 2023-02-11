@@ -1,5 +1,6 @@
 import axios from "axios";
 import router from "next/router";
+import { SpotifyRefreshTokenResponse } from "types";
 import { checkTokenExpiry, closePopup } from "./utils";
 // import { checkTokenExpiry, LOCALSTORAGE_KEYS } from "./utils";
 
@@ -12,7 +13,7 @@ export const LOCALSTORAGE_KEYS = {
 }
 
 
-export const loadToken = () => {
+export const loadToken = (): void => {
   const { access_token, refresh_token, expires_in, error} = router.query;
 
   if (error){
@@ -31,7 +32,7 @@ export const loadToken = () => {
 }
 
 
-export const useToken = () => {
+export const useToken = (): string => {
     // console.log(window.localStorage)
     
     const localAccessToken = window.localStorage.getItem(LOCALSTORAGE_KEYS.accessToken);
@@ -52,7 +53,7 @@ export const useToken = () => {
 }
   
 
-export const refreshToken = async () => {
+export const refreshToken = async (): Promise<void> => {
     try {
       const localRefreshToken = window.localStorage.getItem(LOCALSTORAGE_KEYS.refreshToken);
       const localTokenTimestamp = window.localStorage.getItem(LOCALSTORAGE_KEYS.timestamp);
@@ -65,10 +66,10 @@ export const refreshToken = async () => {
         console.error('No refresh token available');
         logOut();
       }
-      const { data } = await axios.get(`${process.env.SERVER_URL}:${process.env.SERVER_PORT}/login/refresh_token?refresh_token=${localRefreshToken}`);
-      console.log("New Access Token", data.access_token)
+      const refreshRes: SpotifyRefreshTokenResponse = (await axios.get(`${process.env.SERVER_URL}:${process.env.SERVER_PORT}/login/refresh_token?refresh_token=${localRefreshToken}`)).data;
+      // console.log("New Access Token", data.access_token)
   
-      window.localStorage.setItem(LOCALSTORAGE_KEYS.accessToken, data.access_token);
+      window.localStorage.setItem(LOCALSTORAGE_KEYS.accessToken, refreshRes.access_token);
       window.localStorage.setItem(LOCALSTORAGE_KEYS.timestamp, Date.now().toString());
 
       window.location.reload();
@@ -80,7 +81,7 @@ export const refreshToken = async () => {
   
 
 
-export const logOut = () => {
+export const logOut = (): void => {
     for (const property in LOCALSTORAGE_KEYS) {
       window.localStorage.removeItem(LOCALSTORAGE_KEYS[property]);
       location.reload();

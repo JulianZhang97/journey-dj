@@ -1,4 +1,5 @@
 import * as express from 'express';
+import { MapboxTripData, CreatePlaylistReqQuery, CreatePlaylistRes } from 'types';
 import { getTripDuration } from '../services/mapbox';
 import {
   generatePlaylist
@@ -6,18 +7,20 @@ import {
 const router = express.Router();
 //TODO: Add error handling and responses to client
 
-router.get('/', async (req, res) => {
+router.get('/', async (req, res: express.Response<CreatePlaylistRes | {error: string}>) => {
   //TODO: Need request typings here
 
   const { originCoordStr, destinationCoordStr, travelType, spotifyToken, playlistName } = req.query;
 
   try{
   //Request needs to include origin/destination + Spotify user credentails
-  const {tripDuration, tripInfo} = await getTripDuration(
+  const tripRes: MapboxTripData  = await getTripDuration(
     originCoordStr as string,
     destinationCoordStr as string,
     travelType as string
   );
+
+  const {tripDuration, tripInfo} = tripRes;
 
   if (!tripDuration) throw Error("Missing trip duration information! Cannot make playlist...");
 
@@ -30,9 +33,8 @@ router.get('/', async (req, res) => {
   );
 
   res.send({
-    tripDuration,
+    tripRes,
     playlist: generatedPlaylist,
-    tripInfo
   });
   }catch (error) {
     console.log(error);

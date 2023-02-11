@@ -1,10 +1,10 @@
 import * as express from 'express';
 import axios from 'axios';
 import * as qs from 'qs';
+import { SpotifyRefreshTokenResponse } from 'types';
 
 const router = express.Router();    
 
-// TODO: Need to add standardized client/server payload typings
 router.get('/', function(req, res) {
   const state = Math.random().toString(16);
   const scope = 'user-read-email user-top-read user-library-read playlist-read-private playlist-modify-private';
@@ -69,7 +69,7 @@ router.get('/callback', async function(req, res) {
     }
   });
 
-router.get('/refresh_token', async function(req, res) {
+router.get('/refresh_token', async function(req, res: express.Response<SpotifyRefreshTokenResponse>) {
   try{
     console.log("Refreshing Token")
 
@@ -79,7 +79,7 @@ router.get('/refresh_token', async function(req, res) {
         Authorization: `Basic ${new Buffer(`${process.env.SPOTIFY_CLIENT_ID}:${process.env.SPOTIFY_CLIENT_SECRET}`).toString('base64')}`,
       }
 
-    const refreshRes = await axios({
+    const refreshRes: SpotifyRefreshTokenResponse = (await axios({
         method: 'post',
         url: 'https://accounts.spotify.com/api/token',
         data: qs.stringify({
@@ -87,8 +87,8 @@ router.get('/refresh_token', async function(req, res) {
           refresh_token: refresh_token
         }),
         headers
-      });
-      res.send(refreshRes.data);
+      })).data;
+      res.send(refreshRes);
   }
   catch(error){
     console.error("Refresh token error occured", error);

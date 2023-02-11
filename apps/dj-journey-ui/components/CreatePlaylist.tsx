@@ -2,34 +2,11 @@ import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
 
 import { useEffect, useState } from 'react';
+import { PlaylistInfo, CreatePlaylistComponentProps, CreatePlaylistReqQuery, MapboxTripData } from 'types';
 import { createPlaylist } from '../common/spotify';
 import { setAddressResult } from '../common/utils';
 import UserMap from './UserMap';
 
-export interface PlaylistParams {
-  originCoordStr: string;
-  destinationCoordStr: string;
-  travelType: string;
-  spotifyToken: string;
-  playlistName: string;
-}
-
-interface CreatePlaylistProps {
-  spotifyToken: string;
-}
-
-interface PlaylistInfo {
-  message: string;
-  playlistDurationSeconds: number;
-  playlistId: string;
-  playlistLength: number;
-}
-
-export interface PlaylistRes {
-  tripDuration: number;
-  playlist: PlaylistInfo;
-  tripInfo: any;
-}
 
 const stepMap = {
   0: 'travelType',
@@ -53,15 +30,17 @@ const travelTypeMap = {
   'mapbox/walking': 'Walking',
 };
 
-export function CreatePlaylist(props: CreatePlaylistProps) {
+export function CreatePlaylist(props: CreatePlaylistComponentProps) {
   const { spotifyToken } = props;
   const [step, setStep] = useState<number>(0);
 
   // const [origin, setOrigin] = useState<number[]>([-79.383935, 43.653482]);
-  const [origin, setOrigin] = useState<number[]>(null);
   // const [destination, setDestination] = useState<number[]>([
   //   -75.690057, 45.421143
   // ]);
+  
+  const [origin, setOrigin] = useState<number[]>(null);
+
   const [destination, setDestination] = useState<number[]>(null);
 
   const [originName, setOriginName] = useState<string>();
@@ -70,16 +49,14 @@ export function CreatePlaylist(props: CreatePlaylistProps) {
   const [travelType, setTravelType] = useState<string>(null);
   const [playlistName, setPlaylistName] = useState<string>(null);
 
-  const [tripDuration, setTripDuration] = useState<number>(null);
   const [playlistInfo, setPlaylistInfo] = useState<PlaylistInfo>(null);
-  const [tripInfo, setTripInfo] = useState(null);
+  const [tripData, setTripData] = useState<MapboxTripData>(null);
 
   //   useEffect(() => {
   //     console.log('Current Step Is', step);
   //   }, [step]);
 
   function nextStep() {
-    // TODO: Enable this when fixes are done
     if (step === Object.keys(stepMap).length - 2) {
       loadPlaylist();
     }
@@ -101,10 +78,10 @@ export function CreatePlaylist(props: CreatePlaylistProps) {
     setOrigin(null);
     setDestination(null);
     setOriginName(null);
-    setDestination(null);
+    setDestinationName(null);
     setTravelType(null);
     setPlaylistName(null);
-    setTripDuration(null);
+    setTripData(null);
     setPlaylistInfo(null);
   }
 
@@ -142,7 +119,7 @@ export function CreatePlaylist(props: CreatePlaylistProps) {
       return;
     }
 
-    const params: PlaylistParams = {
+    const params: CreatePlaylistReqQuery = {
       originCoordStr: setAddressResult(origin),
       destinationCoordStr: setAddressResult(destination),
       travelType,
@@ -152,9 +129,8 @@ export function CreatePlaylist(props: CreatePlaylistProps) {
     try {
       const res = await createPlaylist(params);
       console.log(res);
-      setTripDuration(res.tripDuration);
+      setTripData(res.tripRes);
       setPlaylistInfo(res.playlist);
-      setTripInfo(res.tripInfo);
     } catch (error) {
       console.error('Could not create playlist!', error);
     }
@@ -223,13 +199,12 @@ export function CreatePlaylist(props: CreatePlaylistProps) {
           />
         )}
       </div>
-      {tripDuration && (
+      {tripData && (
         <div>
-          {tripDuration && tripInfo && playlistInfo && (
+          {tripData && playlistInfo && (
             <div className="resultsContainer">
               <UserMap
-                tripDuration={tripDuration}
-                tripInfo={tripInfo}
+                tripData={tripData}
               />
               <h1 className="prompt">This is your playlist:</h1>
               <iframe src={`https://open.spotify.com/embed/playlist/${playlistInfo.playlistId}?utm_source=generator`} width="100%" height="352" frameBorder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>

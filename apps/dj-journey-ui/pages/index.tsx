@@ -10,8 +10,8 @@ import CreatePlaylist from '../components/CreatePlaylist';
 export function Index() {
   const { query, isReady } = useRouter();
 
-  const [token, setToken] = useState(null);
-  const [profile, setProfile] = useState(null);
+  const [token, setToken] = useState<string>(null);
+  const [profile, setProfile] = useState<SpotifyApi.CurrentUsersProfileResponse>(null);
 
   useEffect(() => {
     if (token) {

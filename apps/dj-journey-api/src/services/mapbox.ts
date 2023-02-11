@@ -1,7 +1,8 @@
 import axios from 'axios';
+import { MapboxTripData } from 'types';
 
 
-export async function getTripDuration(origin: string, destination: string, travelType: string): Promise<{tripDuration: number, tripInfo}>{
+export async function getTripDuration(origin: string, destination: string, travelType: string): Promise<MapboxTripData>{
     try{    
         const tripPoints = encodeURIComponent(`${origin};${destination}`);
         const reqURL = `${process.env.MAPBOX_MATRIX_URL}/${travelType}/${tripPoints}?steps=true&geometries=geojson`;
@@ -10,8 +11,8 @@ export async function getTripDuration(origin: string, destination: string, trave
         const params = {
             access_token: accessToken
         }
-
         const tripRes = (await axios.get(reqURL, {params})).data;
+        //Are there Mapbox Direction API Typings??
         const tripDuration = tripRes.routes[0].duration;
         const tripInfo = tripRes.routes[0];
         
