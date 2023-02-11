@@ -37,3 +37,26 @@ export const convertDurationSecondsToStr = (timeInSeconds: number): string => {
   }
   return duration.join(' ');
 }
+
+export const getUserLocation = async (): Promise<{latitude: string, longitude: string} | null> =>  {
+  function getPosition(options?: PositionOptions) {
+    return new Promise((resolve, reject) => 
+        navigator.geolocation.getCurrentPosition(resolve, reject, options)
+    );
+  }
+
+  const options = {
+    timeout: 5000,
+  };
+  try{
+    const pos: any = await getPosition(options)
+    const {coords} = pos;
+    return {longitude: coords.longitude, latitude: coords.latitude}
+  }
+  catch(err){
+    console.error("Failed to get user location!", err.message);
+    return null;
+  }
+  return null;
+}
+

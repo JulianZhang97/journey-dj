@@ -4,7 +4,7 @@ import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
 import { useEffect, useState } from 'react';
 import { PlaylistInfo, CreatePlaylistComponentProps, CreatePlaylistReqQuery, MapboxTripData } from 'types';
 import { createPlaylist } from '../common/spotify';
-import { setAddressResult } from '../common/utils';
+import { getUserLocation, setAddressResult } from '../common/utils';
 import UserMap from './UserMap';
 
 
@@ -51,6 +51,7 @@ export function CreatePlaylist(props: CreatePlaylistComponentProps) {
 
   const [playlistInfo, setPlaylistInfo] = useState<PlaylistInfo>(null);
   const [tripData, setTripData] = useState<MapboxTripData>(null);
+  const [userCoords, setUserCoords] = useState<{longitude: string, latitude:string}>(null);
 
   //   useEffect(() => {
   //     console.log('Current Step Is', step);
@@ -137,23 +138,40 @@ export function CreatePlaylist(props: CreatePlaylistComponentProps) {
   }
 
   useEffect(() => {
+    async function setUserLocation(){
+      const loc = await getUserLocation();
+      if (loc){
+        setUserCoords(loc);
+      }
+    }
+    setUserLocation();
+  }, []);
+
+  async function loadSearchBox() {
+    const locationGeocoder = new MapboxGeocoder({
+      accessToken: process.env.MAPBOX_TOKEN,
+    });
+    if(userCoords)
+      locationGeocoder.setProximity(userCoords);
+    
+    locationGeocoder.addTo('#addressBox');
+    locationGeocoder.on('result', (input) => {
+      console.log(input.result.center);
+      if (stepMap[step] === 'origin') {
+        setOrigin(input.result.center);
+        setOriginName(input.result.place_name);
+      } else if (stepMap[step] === 'destination') {
+        setDestination(input.result.center);
+        setDestinationName(input.result.place_name);
+      }
+      locationGeocoder.clear();
+      nextStep();
+    });
+  }
+ 
+  useEffect(() => {
     if (stepMap[step] === 'origin' || stepMap[step] === 'destination') {
-      const locationGeocoder = new MapboxGeocoder({
-        accessToken: process.env.MAPBOX_TOKEN,
-      });
-      locationGeocoder.addTo('#addressBox');
-      locationGeocoder.on('result', (input) => {
-        console.log(input.result.center);
-        if (stepMap[step] === 'origin') {
-          setOrigin(input.result.center);
-          setOriginName(input.result.place_name);
-        } else if (stepMap[step] === 'destination') {
-          setDestination(input.result.center);
-          setDestinationName(input.result.place_name);
-        }
-        locationGeocoder.clear();
-        nextStep();
-      });
+      loadSearchBox();
     }
   }, [step]);
 
@@ -270,6 +288,7 @@ export function CreatePlaylist(props: CreatePlaylistComponentProps) {
         {step === Object.keys(stepMap).length - 2 && (
           <button
             onClick={nextStep}
+            disabled={!playlistName || playlistName.length === 0}
             className="button-pill rounded playlistButton"
           >
             Create Playlist
