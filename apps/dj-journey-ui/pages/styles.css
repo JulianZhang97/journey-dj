@@ -200,7 +200,7 @@ svg {
 
 .mapContainer{
   display: flex;
-  margin-bottom: 65px;
+  margin-bottom: 50px;
 }
 
 .responseContainer{
@@ -266,6 +266,9 @@ svg {
   margin: 15px;
 }
 
+.tripInfoButton {
+  padding: 1rem 2rem !important;
+}
 
 .logoutButton {
   font-size: 1rem;

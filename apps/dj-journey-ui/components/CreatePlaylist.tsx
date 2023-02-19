@@ -4,7 +4,7 @@ import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
 import { useEffect, useState } from 'react';
 import { PlaylistInfo, CreatePlaylistComponentProps, MapboxTripData } from 'types';
 import { logOut } from '../common/auth';
-import { createPlaylistHelper, FINAL_USER_STEP, getUserLocation, stepMap } from '../common/utils';
+import { createPlaylistHelper, FINAL_USER_STEP, getUserLocation, RESULT_STEP, stepMap } from '../common/utils';
 import { PlaylistButtons } from './PlaylistButtons';
 import PlaylistResponses from './PlaylistResponses';
 import PlaylistResult from './PlaylistResult';
@@ -99,7 +99,7 @@ export function CreatePlaylist(props: CreatePlaylistComponentProps) {
   return (
     <div className="container">
       <Prompt step={step}/>
-      <div className="responseContainer">
+      {step !== RESULT_STEP && <div className="responseContainer">
         {stepMap[step] === 'travelType' && (
           <TravelMethodButtons selectTravel={selectTravel}/>
         )}
@@ -116,7 +116,7 @@ export function CreatePlaylist(props: CreatePlaylistComponentProps) {
             onChange={handlePlaylistChange}
           />
         )}
-      </div>
+      </div>}
       <PlaylistResult tripData={tripData} playlistInfo={playlistInfo} />
       <PlaylistResponses step={step} travelType={travelType} destinationName={destinationName} originName={originName} playlistName={playlistName} />
       <PlaylistButtons startOver={() => window.location.reload()} prevStep={prevStep} nextStep={nextStep} step={step} playlistName={playlistName}/>

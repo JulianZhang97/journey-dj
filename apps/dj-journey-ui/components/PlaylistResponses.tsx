@@ -11,7 +11,7 @@ export function PlaylistResponses(props: PlaylistResponsesProps) {
         <div className="tripInfoContainer">
           {travelType && (
             <div className="tripInfoButtonContainer">
-              <button className="button-pill rounded light-blue-button">
+              <button className="button-pill rounded light-blue-button tripInfoButton">
                 <span>
                   <span>I will be travelling by</span>
                   {travelTypeMap[travelType]}
@@ -21,7 +21,7 @@ export function PlaylistResponses(props: PlaylistResponsesProps) {
           )}
           {originName && (
             <div className="tripInfoButtonContainer">
-              <button className="button-pill rounded light-blue-button">
+              <button className="button-pill rounded light-blue-button tripInfoButton">
                 <span>
                   <span>I will be leaving from</span>
                   {originName}
@@ -32,7 +32,7 @@ export function PlaylistResponses(props: PlaylistResponsesProps) {
           {destinationName && (
             <div className="tripInfoButtonContainer">
               <div />
-              <button className="button-pill rounded light-blue-button">
+              <button className="button-pill rounded light-blue-button tripInfoButton">
                 <span>
                   <span>I will be travelling to</span>
                   {destinationName}
@@ -43,7 +43,7 @@ export function PlaylistResponses(props: PlaylistResponsesProps) {
           {playlistName && (
             <div className="tripInfoButtonContainer">
               <div />
-              <button className="button-pill rounded light-blue-button">
+              <button className="button-pill rounded light-blue-button tripInfoButton">
                 <span>
                   <span>My playlist will be called</span>
                   {playlistName}

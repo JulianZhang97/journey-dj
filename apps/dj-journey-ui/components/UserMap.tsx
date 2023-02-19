@@ -53,8 +53,7 @@ export function UserMap(props: MapProps) {
             bounds: generateBoundsFromCoordinates(tripData.tripInfo.geometry.coordinates),
             fitBoundsOptions: {padding: 40, animate: true, }
           }}
-          // ref={mapRef}
-          style={{ width: 500, height: 300 }}
+          style={{ width: '100%', height: '100%' }}
           mapStyle="mapbox://styles/mapbox/streets-v12"
           mapboxAccessToken={process.env.MAPBOX_TOKEN}
         >
