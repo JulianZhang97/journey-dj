@@ -2,33 +2,15 @@ import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
 
 import { useEffect, useState } from 'react';
-import { PlaylistInfo, CreatePlaylistComponentProps, CreatePlaylistReqQuery, MapboxTripData } from 'types';
+import { PlaylistInfo, CreatePlaylistComponentProps, MapboxTripData } from 'types';
 import { logOut } from '../common/auth';
-import { createPlaylist } from '../common/playlist';
-import { getUserLocation, setAddressResult } from '../common/utils';
+import { createPlaylistHelper, FINAL_USER_STEP, getUserLocation, stepMap } from '../common/utils';
 import { PlaylistButtons } from './PlaylistButtons';
+import PlaylistResponses from './PlaylistResponses';
 import PlaylistResult from './PlaylistResult';
 import Prompt from './Prompt';
 import TravelMethodButtons from './TravelMethodButtons';
 
-
-
-export const stepMap = {
-  0: 'travelType',
-  1: 'origin',
-  2: 'destination',
-  3: 'name',
-  4: 'result',
-};
-
-const travelTypeMap = {
-  'mapbox/cycling': 'Cycling',
-  'mapbox/driving-traffic': 'Driving',
-  'mapbox/walking': 'Walking',
-};
-
-export const FINAL_USER_STEP =  Object.keys(stepMap).length - 2
-export const RESULT_STEP =  Object.keys(stepMap).length - 1
 
 export function CreatePlaylist(props: CreatePlaylistComponentProps) {
   const { spotifyToken } = props;
@@ -50,47 +32,23 @@ export function CreatePlaylist(props: CreatePlaylistComponentProps) {
     }, [step]);
 
     useEffect(() => {
-      if (stepMap[step] === 'origin' || stepMap[step] === 'destination') {
-        loadSearchBox();
-      }
+      if (stepMap[step] === 'origin' || stepMap[step] === 'destination') loadSearchBox();
     }, [step]);
 
     useEffect(() => {
       async function setUserLocation(){
         const loc = await getUserLocation();
-        if (loc){
-          setUserCoords(loc);
-        }
+        if (loc) setUserCoords(loc);
       }
       setUserLocation();
     }, []);
 
-
-
-
   function nextStep() {
-    if (step === Object.keys(stepMap).length - 2) loadPlaylist();
-    
-    if (step <= Object.keys(stepMap).length - 2) setStep(step + 1);
-
+    if (step === FINAL_USER_STEP) makePlaylist();
+    setStep(step + 1);
   }
   function prevStep() {
-    if (step > 0) {
-      removeGeoCoderBox();
-      setStep(step - 1);
-    }
-  }
-
-  function startOver() {
-    setStep(0);
-    setOrigin(null);
-    setDestination(null);
-    setOriginName(null);
-    setDestinationName(null);
-    setTravelType(null);
-    setPlaylistName(null);
-    setTripData(null);
-    setPlaylistInfo(null);
+    setStep(step - 1);
   }
 
   // Need to do this as the Geocoder box won't unrender otherwise
@@ -98,9 +56,7 @@ export function CreatePlaylist(props: CreatePlaylistComponentProps) {
     const geocoderEls = document.getElementsByClassName(
       'mapboxgl-ctrl-geocoder mapboxgl-ctrl'
     );
-    if (geocoderEls.length > 0) {
-      geocoderEls[0].remove();
-    }
+    if (geocoderEls.length > 0) geocoderEls[0].remove();
   }
 
   function handlePlaylistChange(event) {
@@ -112,39 +68,11 @@ export function CreatePlaylist(props: CreatePlaylistComponentProps) {
     nextStep();
   }
 
-  async function loadPlaylist() {
-    if (
-      !origin ||
-      origin.length !== 2 ||
-      !destination ||
-      destination.length !== 2
-    ) {
-      console.error("Missing required location data! Can't make playlist...");
-      return;
-    }
-    if (!playlistName || !travelType) {
-      console.error("Missing travel or playlist data! Can't make playlist...");
-      return;
-    }
-
-    const params: CreatePlaylistReqQuery = {
-      originCoordStr: setAddressResult(origin),
-      destinationCoordStr: setAddressResult(destination),
-      travelType,
-      spotifyToken,
-      playlistName,
-    };
-    try {
-      const res = await createPlaylist(params);
-      console.log(res);
+  async function makePlaylist() {
+      const res = await createPlaylistHelper(origin, destination, playlistName, travelType, spotifyToken);
       setTripData(res.tripRes);
       setPlaylistInfo(res.playlist);
-    } catch (error) {
-      console.error('Could not create playlist!', error);
-    }
   }
-
-
 
   async function loadSearchBox() {
     const locationGeocoder = new MapboxGeocoder({
@@ -155,7 +83,7 @@ export function CreatePlaylist(props: CreatePlaylistComponentProps) {
     
     locationGeocoder.addTo('#addressBox');
     locationGeocoder.on('result', (input) => {
-      console.log(input.result.center);
+      // console.log(input.result.center);
       if (stepMap[step] === 'origin') {
         setOrigin(input.result.center);
         setOriginName(input.result.place_name);
@@ -167,8 +95,6 @@ export function CreatePlaylist(props: CreatePlaylistComponentProps) {
       nextStep();
     });
   }
- 
-
 
   return (
     <div className="container">
@@ -192,53 +118,8 @@ export function CreatePlaylist(props: CreatePlaylistComponentProps) {
         )}
       </div>
       <PlaylistResult tripData={tripData} playlistInfo={playlistInfo} />
-      {step !== Object.keys(stepMap).length - 1 && (
-        <div className="tripInfoContainer">
-          {travelType && (
-            <div className="tripInfoButtonContainer">
-              <button className="button-pill rounded light-blue-button">
-                <span>
-                  <span>I will be travelling by</span>
-                  {travelTypeMap[travelType]}
-                </span>
-              </button>
-            </div>
-          )}
-          {originName && (
-            <div className="tripInfoButtonContainer">
-              <button className="button-pill rounded light-blue-button">
-                <span>
-                  <span>I will be leaving from</span>
-                  {originName}
-                </span>
-              </button>
-            </div>
-          )}
-          {destinationName && (
-            <div className="tripInfoButtonContainer">
-              <div />
-              <button className="button-pill rounded light-blue-button">
-                <span>
-                  <span>I will be travelling to</span>
-                  {destinationName}
-                </span>
-              </button>
-            </div>
-          )}
-          {playlistName && (
-            <div className="tripInfoButtonContainer">
-              <div />
-              <button className="button-pill rounded light-blue-button">
-                <span>
-                  <span>My playlist will be called</span>
-                  {playlistName}
-                </span>
-              </button>
-            </div>
-          )}
-        </div>
-      )}
-      <PlaylistButtons startOver={startOver} prevStep={prevStep} nextStep={nextStep} step={step} playlistName={playlistName}/>
+      <PlaylistResponses step={step} travelType={travelType} destinationName={destinationName} originName={originName} playlistName={playlistName} />
+      <PlaylistButtons startOver={() => window.location.reload()} prevStep={prevStep} nextStep={nextStep} step={step} playlistName={playlistName}/>
       <div className="footerContainer">
       <button className="button-pill rounded logoutButton" onClick={logOut}>
             Logout

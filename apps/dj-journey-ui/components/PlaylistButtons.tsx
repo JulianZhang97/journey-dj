@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { PlaylistButtonsProps } from 'types';
-import { FINAL_USER_STEP, RESULT_STEP, stepMap } from './CreatePlaylist';
+import { FINAL_USER_STEP, RESULT_STEP } from '../common/utils';
 
 
 export function PlaylistButtons(props: PlaylistButtonsProps) {
@@ -9,7 +9,7 @@ export function PlaylistButtons(props: PlaylistButtonsProps) {
 
     return (
         <div className="playlistButtons">
-        {step !== 0 && step <= FINAL_USER_STEP && (
+        {step > 0 && step <= FINAL_USER_STEP && (
           <button
             onClick={prevStep}
             className="button-pill rounded playlistButton"

@@ -32,8 +32,12 @@ export interface PlaylistResultProps {
   playlistInfo: PlaylistInfo
 }
 
-export interface PlaylistInfoProps {
-  test: string,
+export interface PlaylistResponsesProps {
+  step: number,
+  travelType: string,
+  originName: string,
+  destinationName: string,
+  playlistName: string
 }
 export interface PlaylistButtonsProps {
   step: number,
