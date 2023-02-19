@@ -1,3 +1,4 @@
+import { LngLatBoundsLike } from "react-map-gl";
 
 
 export const checkTokenExpiry = (expiryTime: string | undefined, timestamp: string | undefined): boolean => {
@@ -36,6 +37,32 @@ export const convertDurationSecondsToStr = (timeInSeconds: number): string => {
       duration.push(`${minutes} minute${minutes > 1 ? 's' : ''}`);
   }
   return duration.join(' ');
+}
+
+export const generateBoundsFromCoordinates = (coordinateArr: [number, number][]): LngLatBoundsLike => {
+  if (coordinateArr.length === 0) throw Error("Invalid coordinates submitted! Cannot generate map bounds...");
+  
+  let minLat: number;
+  let maxLat: number;
+  let minLng: number;
+  let maxLng: number;
+
+  coordinateArr.forEach((coords) => {
+    const curLat = coords[1];
+    const curLng = coords[0];
+    if (!minLat) minLat = curLat;
+    if (!minLng) minLng = curLng;
+    if (!maxLat) maxLat = curLat;
+    if (!maxLng) maxLng = curLng;
+
+    if (curLat < minLat) minLat = curLat;
+    if (curLat > maxLat) maxLat = curLat;
+    if (curLng < minLng) minLng = curLng;
+    if (curLng > maxLng) maxLng = curLng;
+
+  });
+
+  return [[minLng, minLat], [maxLng, maxLat]]
 }
 
 export const getUserLocation = async (): Promise<{latitude: string, longitude: string} | null> =>  {

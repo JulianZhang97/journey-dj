@@ -10,7 +10,38 @@ export interface CreatePlaylistComponentProps {
   spotifyToken: string;
 }
 
+export interface HeaderProps {
+  profile: SpotifyApi.CurrentUsersProfileResponse
+}
 
+export interface MainProps {
+  profile: SpotifyApi.CurrentUsersProfileResponse
+  token: string;
+}
+
+export interface PromptProps {
+  step: number
+}
+
+export interface TravelMethodProps {
+  selectTravel: (travelType: string) => void;
+}
+
+export interface PlaylistResultProps {
+  tripData: MapboxTripData,
+  playlistInfo: PlaylistInfo
+}
+
+export interface PlaylistInfoProps {
+  test: string,
+}
+export interface PlaylistButtonsProps {
+  step: number,
+  playlistName: string,
+  nextStep: () => void;
+  prevStep: () => void;
+  startOver: ()=> void;
+}
 
 // Playlist Song Genereation Typings
 

@@ -5,7 +5,7 @@ axios.defaults.baseURL = 'https://api.spotify.com/v1';
 axios.defaults.headers['Content-Type'] = 'application/json';
 
 
-export const getCurrentUserProfile = async (localAccessToken: string): Promise<SpotifyApi.CurrentUsersProfileResponse> => {
+export const getCurrentUserSpotifyProfile = async (localAccessToken: string): Promise<SpotifyApi.CurrentUsersProfileResponse> => {
     try{
         console.log("Fetching User Profile")
         if (localAccessToken === (null || undefined)) {

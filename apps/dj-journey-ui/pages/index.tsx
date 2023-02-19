@@ -1,24 +1,21 @@
 import React, { useEffect, useState } from 'react';
-import { useToken, logOut, loadToken } from '../common/auth';
-import { getCurrentUserProfile } from '../common/spotify';
-import SignInButton from '../components/SignInButton';
+import { useToken, loadToken } from '../common/auth';
+import { getCurrentUserSpotifyProfile } from '../common/playlist';
 import { useRouter } from 'next/router';
-import CreatePlaylist from '../components/CreatePlaylist';
+import Header from '../components/Header';
+import Main from '../components/Main';
 
 //nx serve dj-journey-ui
-
 export function Index() {
   const { query, isReady } = useRouter();
-
   const [token, setToken] = useState<string>(null);
   const [profile, setProfile] = useState<SpotifyApi.CurrentUsersProfileResponse>(null);
 
   useEffect(() => {
     if (token) {
       const fetchData = async () => {
-        setProfile(await getCurrentUserProfile(token));
+        setProfile(await getCurrentUserSpotifyProfile(token));
       };
-
       fetchData();
     }
   }, [token]);
@@ -29,40 +26,13 @@ export function Index() {
       loadToken();
     }
     setToken(useToken);
-  }, [isReady]);
+  }, [isReady, query.access_token]);
 
   return (
     <div>
       <div className="wrapper">
-        <div className="container headerContainer">
-        <div id="welcomeImage">
-                <img src="https://cdn-icons-png.flaticon.com/128/7306/7306093.png" />
-          </div>
-         {!profile && (<div>
-              <div className="headerText">
-                <div>
-                  <p className="welcomeText title"> Hello there, </p>
-                </div>
-                <div>
-                  <h1 className="welcomeText title2">Welcome to DJ Journey 👋</h1>
-                </div>
-              </div>
-            </div>
-          )}
-          {profile &&(
-            <div className="headerText"> 
-              <h1 className="title2">Welcome Back {profile.display_name}!</h1>
-              <p className="title centerText">Let's make a playlist...</p>
-            </div>
-          )}
-        </div>
-        {!profile && (
-          <div className="container buttonContainer">{<SignInButton />}</div>
-        )}
-        {profile && (
-            <CreatePlaylist spotifyToken={token}/>
-        )}
-        <button className="button-pill" onClick={logOut}>Logout</button>
+        <Header profile={profile}/>
+        <Main profile={profile} token={token}/>
       </div>
     </div>
   );

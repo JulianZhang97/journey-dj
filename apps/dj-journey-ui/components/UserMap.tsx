@@ -1,8 +1,8 @@
 import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
-import { useEffect, useState } from 'react';
-import {Map, Layer, LayerProps, Source } from 'react-map-gl';
+import { useEffect, useRef, useState } from 'react';
+import {Map, Layer, LayerProps, Source, MapRef } from 'react-map-gl';
 import { MapProps } from 'types';
-import { convertDurationSecondsToStr } from '../common/utils';
+import { convertDurationSecondsToStr, generateBoundsFromCoordinates } from '../common/utils';
 
 
 export function UserMap(props: MapProps) {
@@ -10,7 +10,7 @@ export function UserMap(props: MapProps) {
 
   const [routeDataLayerProps, setRouteDataLayerProps] = useState<any>();
   const [geoJSON, setGeoJSON] = useState<any>();
-
+  
     useEffect(() => {
       const route = tripData.tripInfo.geometry.coordinates;
       const geojson = {
@@ -47,13 +47,13 @@ export function UserMap(props: MapProps) {
       <h1 className="prompt">
         Your trip will take about {convertDurationSecondsToStr(tripData.tripDuration)}
       </h1>
-      <div className="mapContainer">
+      {tripData && <div className="mapContainer">
         <Map
           initialViewState={{
-            longitude: -100,
-            latitude: 40,
-            zoom: 1.0,
+            bounds: generateBoundsFromCoordinates(tripData.tripInfo.geometry.coordinates),
+            fitBoundsOptions: {padding: 40, animate: true, }
           }}
+          // ref={mapRef}
           style={{ width: 500, height: 300 }}
           mapStyle="mapbox://styles/mapbox/streets-v12"
           mapboxAccessToken={process.env.MAPBOX_TOKEN}
@@ -62,7 +62,7 @@ export function UserMap(props: MapProps) {
             <Layer {...routeDataLayerProps} />
           </Source>}
           </Map>
-      </div>
+      </div>}
     </div>
   );
 }
